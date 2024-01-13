@@ -36,11 +36,15 @@ class UserManager(BaseUserManager):
 
 
 class CustomUser(AbstractUser):
+
+    class Role(models.TextChoices):
+        WORKER = 'Worker'
+        OWNER = 'Owner'
+
     username = None
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=100)
-    is_owner = models.BooleanField(default=False)
-    is_worker = models.BooleanField(default=False)
+    role = models.CharField(max_length=15, choices=Role.choices, default=Role.WORKER,)
 
     objects = UserManager()
 
