@@ -35,6 +35,14 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
+class Team(models.Model):
+    title = models.CharField(max_length=30)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
+
+    def __str__(self):
+        return self.title
+
+
 class CustomUser(AbstractUser):
 
     class Role(models.TextChoices):
@@ -44,6 +52,7 @@ class CustomUser(AbstractUser):
     username = None
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=100)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='workers', null=True)
     role = models.CharField(max_length=15, choices=Role.choices, default=Role.WORKER,)
 
     objects = UserManager()
