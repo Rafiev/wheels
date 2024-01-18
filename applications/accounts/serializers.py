@@ -1,11 +1,11 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from .models import Team
 
 User = get_user_model()
 
 
-class RegisterSerializer(serializers.ModelSerializer):
-
+class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['email', 'password', 'role', 'team']
@@ -14,8 +14,13 @@ class RegisterSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
         return user
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation.pop('password')
+        return representation
 
-class CustomUserSerializer(serializers.ModelSerializer):
+
+class TeamSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ['email', 'role']
+        model = Team
+        fields = '__all__'

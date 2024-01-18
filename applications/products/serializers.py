@@ -15,6 +15,11 @@ class StorageSerializer(serializers.ModelSerializer):
         storage = Storage.objects.create(**validated_data)
         return storage
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['owner'] = instance.owner.title
+        return representation
+
 
 class WheelSerializer(serializers.ModelSerializer):
 
@@ -37,7 +42,6 @@ class WheelSerializer(serializers.ModelSerializer):
         return wheel
 
     def to_representation(self, instance):
-
         representation = super().to_representation(instance)
         representation['owner'] = instance.owner.title
         representation['storage'] = instance.storage.title
@@ -48,4 +52,4 @@ class WheelListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Wheel
-        fields = ['title']
+        fields = ['id', 'title']

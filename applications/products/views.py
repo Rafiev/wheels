@@ -11,6 +11,8 @@ class StorageAPIView(APIView):
 
     @staticmethod
     def post(request, *args, **kwargs):
+        if not request.user.role == 'Owner':
+            return Response({"msg": "У вас нет прав на это"}, status=status.HTTP_401_UNAUTHORIZED)
         context = {'request': request}
         serializer = StorageSerializer(data=request.data, context=context)
         if serializer.is_valid():
@@ -21,13 +23,13 @@ class StorageAPIView(APIView):
     @staticmethod
     def delete(request, storage_id, *args, **kwargs):
         if not request.user.role == 'Owner':
-            return Response({"msg": "You do not have the right to do this"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"msg": "У вас нет прав на это"}, status=status.HTTP_401_UNAUTHORIZED)
         try:
             storage = Storage.objects.get(id=storage_id)
         except Storage.DoesNotExist:
-            return Response({"msg": "Storage not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"msg": "Хранилище не найдено"}, status=status.HTTP_404_NOT_FOUND)
         storage.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({'msg': "Хранилище успешно удалено"}, status=status.HTTP_204_NO_CONTENT)
 
     def get(self, request, *args, **kwargs):
         if 'storage_id' in kwargs:
@@ -65,27 +67,34 @@ class WheelAPIView(APIView):
     @staticmethod
     def delete(request, wheel_id, *args, **kwargs):
         if not request.user.role == 'Owner':
-            return Response({"msg": "You do not have the right to do this"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"msg": "У вас нет прав на это"}, status=status.HTTP_401_UNAUTHORIZED)
         try:
             wheel = Wheel.objects.get(id=wheel_id)
         except Storage.DoesNotExist:
-            return Response({"msg": "Wheel not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"msg": "Объект не найден"}, status=status.HTTP_404_NOT_FOUND)
         wheel.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({"msg": "Объект успешно удален"}, status=status.HTTP_204_NO_CONTENT)
+
+    def get(self, request, *args, **kwargs):
+        if 'wheel_id' in kwargs:
+            return self.get_detail_wheel(request, **kwargs)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     @staticmethod
-    def get(request, wheel_id, *args, **kwargs):
-        wheel = Wheel.objects.get(id=wheel_id)
-        serializer = WheelSerializer(wheel, many=False)
-
-        return Response(serializer.data)
+    def get_detail_wheel(request, wheel_id, *args, **kwargs):
+        try:
+            wheel = Wheel.objects.get(id=wheel_id)
+            serializer = WheelSerializer(wheel, many=False)
+            return Response(serializer.data)
+        except Wheel.DoesNotExist:
+            return Response({"msg": "Объект не найден"}, status=status.HTTP_404_NOT_FOUND)
 
     @staticmethod
     def put(request, wheel_id, *args, **kwargs):
         try:
             wheel = Wheel.objects.get(id=wheel_id, owner=request.user.team_id)
         except Wheel.DoesNotExist:
-            return Response({"msg": "Wheel not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"msg": "Объект не найден"}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = WheelSerializer(wheel, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
