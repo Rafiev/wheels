@@ -24,3 +24,14 @@ class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
         fields = '__all__'
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    new_password = serializers.CharField(required=True, min_length=6)
+    new_password_confirm = serializers.CharField(required=True, min_length=6)
+
+    def set_new_password(self):
+        user = self.context.get('request').user
+        password = self.validated_data.get('new_password')
+        user.set_password(password)
+        user.save()

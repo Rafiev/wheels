@@ -1,6 +1,7 @@
 from rest_framework import views, status
 from django.contrib.auth import get_user_model
-from applications.accounts.serializers import CustomUserSerializer, TeamSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+from applications.accounts.serializers import CustomUserSerializer, TeamSerializer, ChangePasswordSerializer
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import Team
@@ -50,3 +51,32 @@ class RegisterAPIView(views.APIView):
             return Response({'msg': serializer.data}, status=status.HTTP_201_CREATED)
         return Response({'msg': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
+
+class ChangePasswordAPIView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def post(request):
+        serializer = ChangePasswordSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.set_new_password()
+            return Response({'msg': 'Пароль успешно обновлён'}, status=status.HTTP_200_OK)
+        return Response({'msg': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+
+        def handle_exception(self, exc):
+            response = super().handle_exception(exc)
+            if response.status_code == 401:
+                response.data = {'msg': 'Неправильный логин или пароль'}
+
+            if response.status_code == 400:
+                errors = list(response.data.keys())
+                if len(errors) == 2:
+                    response.data = {'msg': 'Введите логин и пароль'}
+                else:
+                    field = 'пароль' if 'password' in errors else 'логин'
+                    response.data = {'msg': f'Введите {field}'}
+
+            return response
