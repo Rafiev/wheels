@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  # Сервис для PostgreSQL
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: wheels
+      POSTGRES_USER: hello
+      POSTGRES_PASSWORD: 1
+
+  # Сервис для Django
+  web:
+    build: .
+    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hello -d wheels"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      DJANGO_SETTINGS_MODULE: your_project.settings
+      DEBUG: "True"
+      ALLOWED_HOSTS: "localhost,127.0.0.1"
+      DB_URL: "postgres://hello:1@db:5432/wheels"
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge

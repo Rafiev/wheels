@@ -1,6 +1,6 @@
 from rest_framework import views, status
 from django.contrib.auth import get_user_model
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from applications.accounts.serializers import CustomUserSerializer, TeamSerializer, ChangePasswordSerializer
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -81,3 +81,16 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                     response.data = {'msg': f'Введите {field}'}
 
             return response
+
+
+class CustomTokenRefreshView(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            refresh = request.data.get('refresh')
+            access_token = serializer.validated_data.get('access')
+            data = {'access': access_token, 'refresh': refresh}
+            return Response(data)
+
+        return Response(serializer.errors, status=400)
