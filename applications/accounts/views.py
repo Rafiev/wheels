@@ -69,6 +69,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         def handle_exception(self, exc):
             response = super().handle_exception(exc)
             if response.status_code == 401:
+                response.status_code = 422
                 response.data = {'msg': 'Неправильный логин или пароль'}
 
             if response.status_code == 400:
