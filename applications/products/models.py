@@ -23,3 +23,14 @@ class Wheel(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Acceptance(models.Model):
+    created_at = models.DateField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='acceptance')
+    owner = models.ForeignKey(Team, on_delete=models.CASCADE, null=True, related_name='acceptance')
+    storage = models.ForeignKey(Storage, on_delete=models.CASCADE, related_name='acceptance')
+    wheels = models.JSONField()
+
+    def __str__(self):
+        return self.owner.title
