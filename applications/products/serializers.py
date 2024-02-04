@@ -22,7 +22,6 @@ class StorageSerializer(serializers.ModelSerializer):
 
 
 class WheelSerializer(serializers.ModelSerializer):
-    storage = StorageSerializer()
 
     class Meta:
         model = Wheel
@@ -49,14 +48,27 @@ class WheelSerializer(serializers.ModelSerializer):
 
 
 class WheelListSerializer(serializers.ModelSerializer):
+    storage = StorageSerializer()
 
     class Meta:
         model = Wheel
         fields = ['id', 'title']
 
 
-class AcceptanceSerializer(serializers.ModelSerializer):
+class WheelDetailSerializer(serializers.ModelSerializer):
     storage = StorageSerializer()
+
+    class Meta:
+        model = Wheel
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['owner'] = instance.owner.title
+        return representation
+
+
+class AcceptanceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Acceptance
@@ -95,5 +107,21 @@ class AcceptanceListSerializer(serializers.ModelSerializer):
         representation['user'] = instance.user.email
         representation['amount'] = 0
         for a in instance.wheels:
+            print(list(a.values()))
             representation['amount'] += list(a.values())[1]
         return representation
+
+
+class AcceptanceDetailSerializer(serializers.ModelSerializer):
+    storage = StorageSerializer()
+
+    class Meta:
+        model = Acceptance
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['owner'] = instance.owner.title
+        representation['user'] = instance.user.email
+        return representation
+

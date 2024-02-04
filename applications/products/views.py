@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Storage, Wheel, Acceptance
 from .serializers import StorageSerializer, WheelSerializer, WheelListSerializer, AcceptanceSerializer, \
-    AcceptanceListSerializer
+    AcceptanceListSerializer, AcceptanceDetailSerializer, WheelDetailSerializer
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 
@@ -88,7 +88,7 @@ class WheelAPIView(APIView):
     def get_detail_wheel(request, wheel_id, *args, **kwargs):
         try:
             wheel = Wheel.objects.get(id=wheel_id)
-            serializer = WheelSerializer(wheel, many=False)
+            serializer = WheelDetailSerializer(wheel, many=False)
             return Response(serializer.data)
         except Wheel.DoesNotExist:
             return Response({"msg": "Объект не найден"}, status=status.HTTP_404_NOT_FOUND)
@@ -128,7 +128,7 @@ class AcceptanceAPIView(APIView):
     def get_detail(request, acceptance_id, *args, **kwargs):
         try:
             acceptance = Acceptance.objects.get(id=acceptance_id)
-            serializer = AcceptanceSerializer(acceptance, many=False)
+            serializer = AcceptanceDetailSerializer(acceptance, many=False)
             return Response(serializer.data)
         except Acceptance.DoesNotExist:
             return Response({"msg": 'Объект не найден'}, status=status.HTTP_400_BAD_REQUEST)
