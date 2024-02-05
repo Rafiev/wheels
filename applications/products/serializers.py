@@ -48,7 +48,6 @@ class WheelSerializer(serializers.ModelSerializer):
 
 
 class WheelListSerializer(serializers.ModelSerializer):
-    storage = StorageSerializer()
 
     class Meta:
         model = Wheel
@@ -107,7 +106,6 @@ class AcceptanceListSerializer(serializers.ModelSerializer):
         representation['user'] = instance.user.email
         representation['amount'] = 0
         for a in instance.wheels:
-            print(list(a.values()))
             representation['amount'] += list(a.values())[1]
         return representation
 
