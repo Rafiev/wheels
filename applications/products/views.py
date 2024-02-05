@@ -6,6 +6,8 @@ from .serializers import StorageSerializer, WheelSerializer, WheelListSerializer
     AcceptanceListSerializer, AcceptanceDetailSerializer, WheelDetailSerializer
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 
 class StorageAPIView(APIView):
@@ -110,6 +112,23 @@ class WheelAPIView(APIView):
 class AcceptanceAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={'created_at': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_DATE),
+                        'storage': openapi.Schema(type=openapi.TYPE_INTEGER),
+                        'wheels': openapi.Schema(type=openapi.TYPE_ARRAY,
+                                                 items=openapi.Schema(type=openapi.TYPE_OBJECT,
+                                                                      properties={'title': openapi.Schema(type=openapi.TYPE_STRING),
+                                                                                  'amount': openapi.Schema(type=openapi.TYPE_INTEGER), }))},
+            required=['created_at', 'storage', 'wheels']),
+        responses={
+            201: openapi.Response(description="Created",
+                                  examples={'application/json': {'msg': 'Ваша приемка успешно добавлена'}}),
+            400: openapi.Response(description="Bad request",
+                                  examples={'application/json': {'msg': 'serializer.error'}})},
+        operation_summary="Добавление приемки",
+        operation_description="Этот эндпоинт используется для добавления новой приемки.")
     def post(self, request, *args, **kwargs):
         context = {'request': request}
         serializer = AcceptanceSerializer(data=request.data, context=context)
