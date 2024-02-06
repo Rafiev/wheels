@@ -77,7 +77,8 @@ class GetTeamAPIView(views.APIView):
                                                {"email": "a@a.com", "role": "Worker", "team": 3}]}),
             401: openapi.Response(
                 description="Return when user dont have root",
-                examples={'application/json': {'msg': 'У вас нет прав на это'}})})
+                examples={'application/json': {'msg': 'У вас нет прав на это'}})}
+    )
     def get(self, request, *args, **kwargs):
 
         if not request.user.role == 'Owner':

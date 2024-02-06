@@ -51,7 +51,7 @@ class WheelListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Wheel
-        fields = ['id', 'title']
+        fields = ['id', 'title', 'amount']
 
 
 class WheelDetailSerializer(serializers.ModelSerializer):
