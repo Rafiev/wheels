@@ -18,7 +18,7 @@ class Wheel(models.Model):
     owner = models.ForeignKey(Team, on_delete=models.CASCADE, null=True, related_name='wheels')
     title = models.CharField(max_length=50)
     amount = models.PositiveIntegerField(default=0)
-    price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     storage = models.ForeignKey(Storage, on_delete=models.CASCADE, related_name='wheels')
 
     def __str__(self):

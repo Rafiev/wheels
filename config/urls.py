@@ -22,13 +22,9 @@ from drf_yasg.views import get_schema_view
 from django.conf.urls.static import static
 
 schema_view = get_schema_view(
-    openapi.Info(
-        title='Wheels',
-        default_version='V1',
-        description='CRM'
-    ),
-    public=True
-)
+    openapi.Info(title='Wheels API', default_version='V1',
+                 description='Методы используются для мобильных приложений и веб-приложения Wheels',),
+    public=True)
 
 
 urlpatterns = [

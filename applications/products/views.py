@@ -1,6 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from .decorators import acceptance_post_swagger, acceptance_get_swagger, acceptance_get_detail_swagger, \
+    acceptance_delete_swagger, storage_post_swagger, storage_get_swagger, storage_delete_swagger, \
+    storage_get_detail_swagger, wheel_post_swagger, wheel_delete_swagger, wheel_get_detail_swagger, wheel_put_swagger
 from .models import Storage, Wheel, Acceptance
 from .serializers import StorageSerializer, WheelSerializer, WheelListSerializer, AcceptanceSerializer, \
     AcceptanceListSerializer, AcceptanceDetailSerializer, WheelDetailSerializer
@@ -13,8 +16,8 @@ from drf_yasg import openapi
 class StorageAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    @staticmethod
-    def post(request, *args, **kwargs):
+    @storage_post_swagger
+    def post(self, request, *args, **kwargs):
         if not request.user.role == 'Owner':
             return Response({"msg": "У вас нет прав на это"}, status=status.HTTP_401_UNAUTHORIZED)
         context = {'request': request}
@@ -24,8 +27,8 @@ class StorageAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response({"msg": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-    @staticmethod
-    def get(request, *args, **kwargs):
+    @storage_get_swagger
+    def get(self, request, *args, **kwargs):
         storages = Storage.objects.filter(owner=request.user.team_id)
         serializer = StorageSerializer(storages, many=True)
 
@@ -35,8 +38,8 @@ class StorageAPIView(APIView):
 class StorageDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    @staticmethod
-    def delete(request, storage_id, *args, **kwargs):
+    @storage_delete_swagger
+    def delete(self, request, storage_id, *args, **kwargs):
         if not request.user.role == 'Owner':
             return Response({"msg": "У вас нет прав на это"}, status=status.HTTP_401_UNAUTHORIZED)
         try:
@@ -46,8 +49,8 @@ class StorageDetailAPIView(APIView):
         storage.delete()
         return Response({'msg': "Хранилище успешно удалено"}, status=status.HTTP_204_NO_CONTENT)
 
-    @staticmethod
-    def get(request, storage_id, *args, **kwargs):
+    @storage_get_detail_swagger
+    def get(self, request, storage_id, *args, **kwargs):
         search_query = request.query_params.get('search', '')
         wheel_list = Wheel.objects.filter(Q(owner=request.user.team_id) & Q(storage=storage_id) &
                                           Q(title__icontains=search_query))
@@ -59,8 +62,8 @@ class StorageDetailAPIView(APIView):
 class WheelAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    @staticmethod
-    def post(request, *args, **kwargs):
+    @wheel_post_swagger
+    def post(self, request, *args, **kwargs):
         context = {'request': request}
         serializer = WheelSerializer(data=request.data, context=context)
         if serializer.is_valid():
@@ -72,8 +75,8 @@ class WheelAPIView(APIView):
 class WheelDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    @staticmethod
-    def delete(request, wheel_id, *args, **kwargs):
+    @wheel_delete_swagger
+    def delete(self, request, wheel_id, *args, **kwargs):
         if not request.user.role == 'Owner':
             return Response({"msg": "У вас нет прав на это"}, status=status.HTTP_401_UNAUTHORIZED)
         try:
@@ -83,8 +86,8 @@ class WheelDetailAPIView(APIView):
         wheel.delete()
         return Response({"msg": "Объект успешно удален"}, status=status.HTTP_204_NO_CONTENT)
 
-    @staticmethod
-    def get(request, wheel_id, *args, **kwargs):
+    @wheel_get_detail_swagger
+    def get(self, request, wheel_id, *args, **kwargs):
         try:
             wheel = Wheel.objects.get(id=wheel_id)
             serializer = WheelDetailSerializer(wheel, many=False)
@@ -92,8 +95,8 @@ class WheelDetailAPIView(APIView):
         except Wheel.DoesNotExist:
             return Response({"msg": "Объект не найден"}, status=status.HTTP_404_NOT_FOUND)
 
-    @staticmethod
-    def put(request, wheel_id, *args, **kwargs):
+    @wheel_put_swagger
+    def put(self, request, wheel_id, *args, **kwargs):
         try:
             wheel = Wheel.objects.get(id=wheel_id, owner=request.user.team_id)
         except Wheel.DoesNotExist:
@@ -109,23 +112,7 @@ class WheelDetailAPIView(APIView):
 class AcceptanceAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={'created_at': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_DATE),
-                        'storage': openapi.Schema(type=openapi.TYPE_INTEGER),
-                        'wheels': openapi.Schema(type=openapi.TYPE_ARRAY,
-                                                 items=openapi.Schema(type=openapi.TYPE_OBJECT,
-                                                                      properties={'title': openapi.Schema(type=openapi.TYPE_STRING),
-                                                                                  'amount': openapi.Schema(type=openapi.TYPE_INTEGER), }))},
-            required=['created_at', 'storage', 'wheels']),
-        responses={
-            201: openapi.Response(description="Created",
-                                  examples={'application/json': {'msg': 'Ваша приемка успешно добавлена'}}),
-            400: openapi.Response(description="Bad request",
-                                  examples={'application/json': {'msg': 'serializer.error'}})},
-        operation_summary="Добавление приемки",
-        operation_description="Этот эндпоинт используется для добавления новой приемки.")
+    @acceptance_post_swagger
     def post(self, request, *args, **kwargs):
         context = {'request': request}
         serializer = AcceptanceSerializer(data=request.data, context=context)
@@ -134,8 +121,8 @@ class AcceptanceAPIView(APIView):
             return Response({"msg": "Ваша приемка успешно добавлена"}, status=status.HTTP_201_CREATED)
         return Response({"msg": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-    @staticmethod
-    def get(request, *args, **kwargs):
+    @acceptance_get_swagger
+    def get(self, request, *args, **kwargs):
         start_date = request.query_params.get('start_date')
         end_date = request.query_params.get('end_date')
         storage_id = request.query_params.get('storage_id')
@@ -154,8 +141,8 @@ class AcceptanceAPIView(APIView):
 class AcceptanceDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    @staticmethod
-    def get(request, acceptance_id, *args, **kwargs):
+    @acceptance_get_detail_swagger
+    def get(self, request, acceptance_id, *args, **kwargs):
         try:
             acceptance = Acceptance.objects.get(id=acceptance_id)
             serializer = AcceptanceDetailSerializer(acceptance, many=False)
@@ -163,8 +150,8 @@ class AcceptanceDetailAPIView(APIView):
         except Acceptance.DoesNotExist:
             return Response({"msg": 'Объект не найден'}, status=status.HTTP_400_BAD_REQUEST)
 
-    @staticmethod
-    def delete(request, acceptance_id, *args, **kwargs):
+    @acceptance_delete_swagger
+    def delete(self, request, acceptance_id, *args, **kwargs):
         if not request.user.role == 'Owner':
             return Response({"msg": "У вас нет прав на это"}, status=status.HTTP_401_UNAUTHORIZED)
         try:
