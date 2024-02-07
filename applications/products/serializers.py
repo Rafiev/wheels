@@ -18,6 +18,8 @@ class StorageSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['owner'] = instance.owner.title
+        wheels_count = sum([i.amount for i in instance.wheels.all()])
+        representation['amount'] = wheels_count
         return representation
 
 
