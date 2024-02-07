@@ -4,7 +4,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from applications.accounts.serializers import CustomUserSerializer, TeamSerializer, ChangePasswordSerializer
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-
+from rest_framework_simplejwt.exceptions import TokenError
 from .decorators import change_password_swagger, register_swagger, login_swagger, get_users_swagger, team_post_swagger, \
     team_get_swagger
 from .models import Team
@@ -48,6 +48,7 @@ class GetTeamAPIView(views.APIView):
 
 
 class RegisterAPIView(views.APIView):
+    permission_classes = [IsAdminUser]
 
     @register_swagger
     def post(self, request, *args, **kwargs):
@@ -109,5 +110,5 @@ class CustomTokenRefreshView(TokenRefreshView):
                 return Response(data)
 
             return Response(serializer.errors, status=400)
-        except Exception as ex:
-            return Response({"msg": "у вас истек токен"}, status=status.HTTP_401_UNAUTHORIZED)
+        except TokenError:
+            return Response({"msg": "у вас истек токен"}, status=status.HTTP_403_FORBIDDEN)
