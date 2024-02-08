@@ -41,7 +41,7 @@ class StorageDetailAPIView(APIView):
     @storage_delete_swagger
     def delete(self, request, storage_id, *args, **kwargs):
         if not request.user.role == 'Owner':
-            return Response({"msg": "У вас нет прав на это"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"msg": "У вас нет прав на это"}, status=status.HTTP_409_CONFLICT)
         try:
             storage = Storage.objects.get(id=storage_id)
         except Storage.DoesNotExist:
@@ -78,7 +78,7 @@ class WheelDetailAPIView(APIView):
     @wheel_delete_swagger
     def delete(self, request, wheel_id, *args, **kwargs):
         if not request.user.role == 'Owner':
-            return Response({"msg": "У вас нет прав на это"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"msg": "У вас нет прав на это"}, status=status.HTTP_409_CONFLICT)
         try:
             wheel = Wheel.objects.get(id=wheel_id)
         except Storage.DoesNotExist:
@@ -153,7 +153,7 @@ class AcceptanceDetailAPIView(APIView):
     @acceptance_delete_swagger
     def delete(self, request, acceptance_id, *args, **kwargs):
         if not request.user.role == 'Owner':
-            return Response({"msg": "У вас нет прав на это"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"msg": "У вас нет прав на это"}, status=status.HTTP_409_CONFLICT)
         try:
             acceptance = Acceptance.objects.get(id=acceptance_id)
         except Storage.DoesNotExist:

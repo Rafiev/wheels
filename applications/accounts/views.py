@@ -40,7 +40,7 @@ class GetTeamAPIView(views.APIView):
     def get(self, request, *args, **kwargs):
 
         if not request.user.role == 'Owner':
-            return Response({'msg': 'У вас нет прав на это'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'msg': 'У вас нет прав на это'}, status=status.HTTP_409_CONFLICT)
         user_team = User.objects.filter(team_id=request.user.team_id)
         serializer = CustomUserSerializer(user_team, many=True)
 

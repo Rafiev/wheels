@@ -70,22 +70,34 @@ class WheelDetailSerializer(serializers.ModelSerializer):
 
 
 class AcceptanceSerializer(serializers.ModelSerializer):
+    new_wheels = serializers.JSONField(read_only=True)
 
     class Meta:
         model = Acceptance
         fields = '__all__'
 
     def create(self, validated_data):
+        new_wheels_data = self.initial_data.get('new_wheels', [])
         request = self.context.get('request')
         validated_data['owner'] = request.user.team
         validated_data['user'] = request.user
+        validated_data['wheels'].extend(new_wheels_data)
         acceptance = Acceptance.objects.create(**validated_data)
-        wheel_list = [i.values() for i in validated_data['wheels']]
-        for title, amount in wheel_list:
-            wheel, created = Wheel.objects.get_or_create(owner=request.user.team, title=title,
-                                                         storage=validated_data['storage'])
-            wheel.amount += amount
-            wheel.save()
+        wheels_data = validated_data.get('wheels', [])
+        new_wheels_to_create = [Wheel(**wheel_data, owner=request.user.team, storage=validated_data['storage']) for
+                                wheel_data in new_wheels_data]
+        Wheel.objects.bulk_create(new_wheels_to_create)
+        wheels_to_update = list()
+        for wheel_data in wheels_data:
+            title = wheel_data['title']
+            amount = wheel_data['amount']
+            try:
+                wheel = Wheel.objects.get(owner=request.user.team, title=title, storage=validated_data['storage'])
+                wheel.amount += amount
+                wheels_to_update.append(wheel)
+            except Wheel.DoesNotExist:
+                pass
+        Wheel.objects.bulk_update(wheels_to_update, ['amount'])
 
         return acceptance
 

@@ -14,6 +14,12 @@ acceptance_post_swagger = swagger_auto_schema(
                                                                   properties={
                                                                       'title': openapi.Schema(type=openapi.TYPE_STRING),
                                                                       'amount': openapi.Schema(
+                                                                          type=openapi.TYPE_INTEGER), })),
+                    'new_wheels': openapi.Schema(type=openapi.TYPE_ARRAY,
+                                             items=openapi.Schema(type=openapi.TYPE_OBJECT,
+                                                                  properties={
+                                                                      'title': openapi.Schema(type=openapi.TYPE_STRING),
+                                                                      'amount': openapi.Schema(
                                                                           type=openapi.TYPE_INTEGER), }))},
         required=['created_at', 'storage', 'wheels']),
     responses={
