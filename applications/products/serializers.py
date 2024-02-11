@@ -81,23 +81,27 @@ class AcceptanceSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         validated_data['owner'] = request.user.team
         validated_data['user'] = request.user
-        validated_data['wheels'].extend(new_wheels_data)
+        try:
+            validated_data['wheels'].extend(new_wheels_data)
+        except KeyError:
+            validated_data['wheels'] = new_wheels_data
         acceptance = Acceptance.objects.create(**validated_data)
         wheels_data = validated_data.get('wheels', [])
         new_wheels_to_create = [Wheel(**wheel_data, owner=request.user.team, storage=validated_data['storage']) for
                                 wheel_data in new_wheels_data]
         Wheel.objects.bulk_create(new_wheels_to_create)
-        wheels_to_update = list()
-        for wheel_data in wheels_data:
-            title = wheel_data['title']
-            amount = wheel_data['amount']
-            try:
-                wheel = Wheel.objects.get(owner=request.user.team, title=title, storage=validated_data['storage'])
-                wheel.amount += amount
-                wheels_to_update.append(wheel)
-            except Wheel.DoesNotExist:
-                pass
-        Wheel.objects.bulk_update(wheels_to_update, ['amount'])
+        if wheels_data:
+            wheels_to_update = list()
+            for wheel_data in wheels_data:
+                title = wheel_data['title']
+                amount = wheel_data['amount']
+                try:
+                    wheel = Wheel.objects.get(owner=request.user.team, title=title, storage=validated_data['storage'])
+                    wheel.amount += amount
+                    wheels_to_update.append(wheel)
+                except Wheel.DoesNotExist:
+                    pass
+            Wheel.objects.bulk_update(wheels_to_update, ['amount'])
 
         return acceptance
 
@@ -120,7 +124,7 @@ class AcceptanceListSerializer(serializers.ModelSerializer):
         representation['user'] = instance.user.email
         representation['amount'] = 0
         for a in instance.wheels:
-            representation['amount'] += list(a.values())[1]
+            representation['amount'] += a.get('amount', 0)
         return representation
 
 

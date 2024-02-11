@@ -30,7 +30,7 @@ class Acceptance(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='acceptance')
     owner = models.ForeignKey(Team, on_delete=models.CASCADE, null=True, related_name='acceptance')
     storage = models.ForeignKey(Storage, on_delete=models.CASCADE, related_name='acceptance')
-    wheels = models.JSONField()
+    wheels = models.JSONField(null=True)
 
     def __str__(self):
         return self.owner.title

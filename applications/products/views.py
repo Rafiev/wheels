@@ -156,7 +156,7 @@ class AcceptanceDetailAPIView(APIView):
             return Response({"msg": "У вас нет прав на это"}, status=status.HTTP_409_CONFLICT)
         try:
             acceptance = Acceptance.objects.get(id=acceptance_id)
-        except Storage.DoesNotExist:
+        except Acceptance.DoesNotExist:
             return Response({"msg": "Объект не найден"}, status=status.HTTP_404_NOT_FOUND)
         acceptance.delete()
         return Response({"msg": "Объект успешно удален"}, status=status.HTTP_204_NO_CONTENT)
