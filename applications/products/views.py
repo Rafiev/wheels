@@ -52,10 +52,15 @@ class StorageDetailAPIView(APIView):
     @storage_get_detail_swagger
     def get(self, request, storage_id, *args, **kwargs):
         search_query = request.query_params.get('search', '')
-        wheel_list = Wheel.objects.filter(Q(owner=request.user.team_id) & Q(storage=storage_id) &
-                                          Q(title__icontains=search_query))
-        serializer = WheelListSerializer(wheel_list, many=True)
-
+        season = request.query_params.get('season', '')
+        if season:
+            wheel_list = Wheel.objects.filter(Q(owner=request.user.team_id) & Q(storage=storage_id) &
+                                              Q(title__icontains=search_query) & Q(season=season))
+            serializer = WheelListSerializer(wheel_list, many=True)
+        else:
+            wheel_list = Wheel.objects.filter(Q(owner=request.user.team_id) & Q(storage=storage_id) &
+                                              Q(title__icontains=search_query))
+            serializer = WheelListSerializer(wheel_list, many=True)
         return Response(serializer.data)
 
 

@@ -159,7 +159,13 @@ storage_get_detail_swagger = swagger_auto_schema(
                                              in_=openapi.IN_QUERY,
                                              type=openapi.TYPE_STRING,
                                              required=False,
-                                             description='Строка для поиска по названию колеса')],
+                                             description='Строка для поиска по названию колеса'),
+                           openapi.Parameter(name='season',
+                                             in_=openapi.IN_QUERY,
+                                             type=openapi.TYPE_STRING,
+                                             required=False,
+                                             description='Строка для фильтрации по сезону')
+                           ],
         responses={200: openapi.Response(description="", schema=WheelListSerializer(many=True))})
 
 wheel_post_swagger = swagger_auto_schema(

@@ -95,8 +95,10 @@ class AcceptanceSerializer(serializers.ModelSerializer):
             for wheel_data in wheels_data:
                 title = wheel_data['title']
                 amount = wheel_data['amount']
+                season = wheel_data['season']
                 try:
-                    wheel = Wheel.objects.get(owner=request.user.team, title=title, storage=validated_data['storage'])
+                    wheel = Wheel.objects.get(owner=request.user.team, title=title, season=season,
+                                              storage=validated_data['storage'])
                     wheel.amount += amount
                     wheels_to_update.append(wheel)
                 except Wheel.DoesNotExist:

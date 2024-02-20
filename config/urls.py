@@ -33,4 +33,4 @@ urlpatterns = [
     path('api/v1/accounts/', include('applications.accounts.urls')),
     path('api/v1/products/', include('applications.products.urls')),
     path('api/v1/actions/', include('applications.sales.urls'))
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_URL)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
