@@ -17,18 +17,20 @@ class SaleSerializer(serializers.ModelSerializer):
         validated_data['user'] = request.user
         wheel_list = [i.values() for i in validated_data['wheels']]
         wheel_list_for_update = []
-        for title, amount, price in wheel_list:
+        for title, amount, price, season in wheel_list:
             try:
-                wheel = Wheel.objects.get(owner=request.user.team, title=title, storage=validated_data['storage'])
+                wheel = Wheel.objects.get(owner=request.user.team, title=title, storage=validated_data['storage'],
+                                          season=season)
             except Wheel.DoesNotExist:
-                raise ValidationError({"msg": f'Данного продукта нет {title} в наличии'})
+                raise ValidationError({"msg": f'Данного продукта нет {title} {season} в наличии'})
             if not wheel.amount >= amount:
-                raise ValidationError({"msg": f'У вас недостаточно продукта {title} что бы продать его'})
+                raise ValidationError({"msg": f'У вас недостаточно продукта {title} {season} что бы продать его'})
             wheel.amount -= amount
             wheel_list_for_update.append(wheel)
         Wheel.objects.bulk_update(wheel_list_for_update, ['amount'])
         for item in validated_data['wheels']:
             item['total-cost'] = item['amount'] * item['price']
+            item['id'] = Wheel.objects.get(owner=request.user.team, title=item['title'], season=item['season']).id
         sale = Sale.objects.create(**validated_data)
         return sale
 

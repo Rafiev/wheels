@@ -12,6 +12,7 @@ sale_post_swagger = swagger_auto_schema(
                                                                       'title': openapi.Schema(type=openapi.TYPE_STRING),
                                                                       'amount': openapi.Schema(type=openapi.TYPE_INTEGER),
                                                                       'price': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                                                      'season': openapi.Schema(type=openapi.TYPE_STRING)
                                                                   }))},
         required=['created_at', 'storage', 'wheels']),
     responses={
@@ -80,12 +81,16 @@ sale_get_detail_swagger = swagger_auto_schema(
                         "wheels": openapi.Schema(type=openapi.TYPE_ARRAY,
                                                  items=openapi.Schema(type=openapi.TYPE_OBJECT,
                                                                       properties={
+                                                                          "id": openapi.Schema(
+                                                                              type=openapi.TYPE_INTEGER),
                                                                           "title": openapi.Schema(
                                                                               type=openapi.TYPE_STRING),
                                                                           "amount": openapi.Schema(
                                                                               type=openapi.TYPE_INTEGER),
                                                                           "price": openapi.Schema(
                                                                               type=openapi.TYPE_INTEGER),
+                                                                          "season": openapi.Schema(
+                                                                              type=openapi.TYPE_STRING),
                                                                           "total-cost": openapi.Schema(
                                                                               type=openapi.TYPE_INTEGER
                                                                           )
