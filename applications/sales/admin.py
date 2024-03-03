@@ -1,7 +1,5 @@
 from django.contrib import admin
 
-from applications.sales.models import Sale, Defect, Return
+from applications.sales.models import Action
 
-admin.site.register(Sale)
-admin.site.register(Defect)
-admin.site.register(Return)
+admin.site.register(Action)

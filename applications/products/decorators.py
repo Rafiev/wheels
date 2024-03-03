@@ -8,19 +8,20 @@ acceptance_post_swagger = swagger_auto_schema(
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={'created_at': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_DATE),
+                    'season': openapi.Schema(type=openapi.TYPE_STRING),
                     'storage': openapi.Schema(type=openapi.TYPE_INTEGER),
                     'wheels': openapi.Schema(type=openapi.TYPE_ARRAY,
                                              items=openapi.Schema(type=openapi.TYPE_OBJECT,
                                                                   properties={
                                                                       'title': openapi.Schema(type=openapi.TYPE_STRING),
-                                                                      'amount': openapi.Schema(
-                                                                          type=openapi.TYPE_INTEGER), })),
+                                                                      'amount': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                                                  })),
                     'new_wheels': openapi.Schema(
                         type=openapi.TYPE_ARRAY,
                         items=openapi.Schema(type=openapi.TYPE_OBJECT, properties={
                                                                       'title': openapi.Schema(type=openapi.TYPE_STRING),
-                                                                      'amount': openapi.Schema(
-                                                                          type=openapi.TYPE_INTEGER), }))},
+                                                                      'amount': openapi.Schema(type=openapi.TYPE_INTEGER),
+                        }))},
         required=['created_at', 'storage', 'wheels']),
     responses={
         201: openapi.Response(description="",
@@ -54,6 +55,13 @@ acceptance_get_swagger = swagger_auto_schema(
             type=openapi.TYPE_INTEGER,
             required=False,
             description="Идентификатор места хранения для фильтрации"
+        ),
+        openapi.Parameter(
+            name="season",
+            in_=openapi.IN_QUERY,
+            type=openapi.TYPE_INTEGER,
+            required=False,
+            description="Время года для фильтрации"
         )
     ],
     responses={200: openapi.Response(description="",
@@ -93,9 +101,10 @@ acceptance_get_detail_swagger = swagger_auto_schema(
                                                                           "title": openapi.Schema(
                                                                               type=openapi.TYPE_STRING),
                                                                           "amount": openapi.Schema(
-                                                                              type=openapi.TYPE_INTEGER)
+                                                                              type=openapi.TYPE_INTEGER),
                                                                       })),
                         "user": openapi.Schema(type=openapi.TYPE_STRING),
+                        "season": openapi.Schema(type=openapi.TYPE_STRING),
                         "owner": openapi.Schema(type=openapi.TYPE_STRING)})),
         400: openapi.Response(description="", examples={"application/json": {"msg": "Объект не найден"}})})
 

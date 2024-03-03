@@ -131,6 +131,7 @@ class AcceptanceAPIView(APIView):
         start_date = request.query_params.get('start_date')
         end_date = request.query_params.get('end_date')
         storage_id = request.query_params.get('storage_id')
+        season = request.query_params.get('season')
         filters = {'owner': request.user.team_id}
         if start_date:
             filters['created_at__gte'] = start_date
@@ -138,7 +139,9 @@ class AcceptanceAPIView(APIView):
             filters['created_at__lte'] = end_date
         if storage_id:
             filters['storage_id'] = storage_id
-        acceptance = Acceptance.objects.filter(**filters)
+        if season:
+            filters['season'] = season
+        acceptance = Acceptance.objects.filter(**filters).order_by('-created_at')
         serializer = AcceptanceListSerializer(acceptance, many=True)
         return Response(serializer.data)
 

@@ -5,6 +5,7 @@ sale_post_swagger = swagger_auto_schema(
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={'created_at': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_DATE),
+                    'season': openapi.Schema(type=openapi.TYPE_STRING),
                     'storage': openapi.Schema(type=openapi.TYPE_INTEGER),
                     'wheels': openapi.Schema(type=openapi.TYPE_ARRAY,
                                              items=openapi.Schema(type=openapi.TYPE_OBJECT,
@@ -12,7 +13,6 @@ sale_post_swagger = swagger_auto_schema(
                                                                       'title': openapi.Schema(type=openapi.TYPE_STRING),
                                                                       'amount': openapi.Schema(type=openapi.TYPE_INTEGER),
                                                                       'price': openapi.Schema(type=openapi.TYPE_INTEGER),
-                                                                      'season': openapi.Schema(type=openapi.TYPE_STRING)
                                                                   }))},
         required=['created_at', 'storage', 'wheels']),
     responses={
@@ -21,11 +21,57 @@ sale_post_swagger = swagger_auto_schema(
         400: openapi.Response(description=" ",
                               examples={'application/json': {'msg': 'serializer.error'}})},
     operation_summary="Добавление продажи",
-    operation_description="Этот эндпоинт используется для добавления новой приемки.")
+    operation_description="Этот эндпоинт используется для добавления новой продажи.")
 
-sale_get_swagger = swagger_auto_schema(
-    operation_summary="Получение списка продаж",
-    operation_description="Этот эндпоинт возвращает список продаж с возможностью фильтрации по дате и месту хранения.",
+
+defect_post_swagger = swagger_auto_schema(
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={'created_at': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_DATE),
+                    'season': openapi.Schema(type=openapi.TYPE_STRING),
+                    'storage': openapi.Schema(type=openapi.TYPE_INTEGER),
+                    'wheels': openapi.Schema(type=openapi.TYPE_ARRAY,
+                                             items=openapi.Schema(type=openapi.TYPE_OBJECT,
+                                                                  properties={
+                                                                      'title': openapi.Schema(type=openapi.TYPE_STRING),
+                                                                      'amount': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                                                  }))},
+        required=['created_at', 'storage', 'wheels']),
+    responses={
+        201: openapi.Response(description="",
+                              examples={'application/json': {'msg': 'Ваш брак успешно добавлен'}}),
+        400: openapi.Response(description=" ",
+                              examples={'application/json': {'msg': 'serializer.error'}})},
+    operation_summary="Добавление брака",
+    operation_description="Этот эндпоинт используется для добавления нового брака.")
+
+
+return_post_swagger = swagger_auto_schema(
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={'created_at': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_DATE),
+                    'season': openapi.Schema(type=openapi.TYPE_STRING),
+                    'storage': openapi.Schema(type=openapi.TYPE_INTEGER),
+                    'wheels': openapi.Schema(type=openapi.TYPE_ARRAY,
+                                             items=openapi.Schema(type=openapi.TYPE_OBJECT,
+                                                                  properties={
+                                                                      'title': openapi.Schema(type=openapi.TYPE_STRING),
+                                                                      'amount': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                                                  }))},
+        required=['created_at', 'storage', 'wheels']),
+    responses={
+        201: openapi.Response(description="",
+                              examples={'application/json': {'msg': 'Ваш возврат успешно добавлен'}}),
+        400: openapi.Response(description=" ",
+                              examples={'application/json': {'msg': 'serializer.error'}})},
+    operation_summary="Добавление возврата",
+    operation_description="Этот эндпоинт используется для добавления нового возврата.")
+
+
+action_get_swagger = swagger_auto_schema(
+    operation_summary="Получение списка действий",
+    operation_description="Этот эндпоинт возвращает список дейтсвий с возможностью фильтрации по дате, месту хранения, "
+                          "типу действия и времени года.",
     manual_parameters=[
         openapi.Parameter(
             name="start_date",
@@ -47,25 +93,46 @@ sale_get_swagger = swagger_auto_schema(
             type=openapi.TYPE_INTEGER,
             required=False,
             description="Идентификатор места хранения для фильтрации"
+        ),
+        openapi.Parameter(
+            name="season",
+            in_=openapi.IN_QUERY,
+            type=openapi.TYPE_INTEGER,
+            required=False,
+            description="Время года для фильтрации"
+        ),
+        openapi.Parameter(
+            name="action_type",
+            in_=openapi.IN_QUERY,
+            type=openapi.TYPE_INTEGER,
+            required=False,
+            description="Тип действия для фильтрации"
         )
     ],
-    responses={200: openapi.Response(description="",
-                                     examples={"application/json":     [{"id": 54, "created_at": "2024-02-24",
-                                                                         "user": "rafievvv@gmail.com",
-                                                                         "storage": {"id": 6, "title": "Cклад",
-                                                                                     "owner": "Team_1", "parent": None,
-                                                                                     "amount": 0},
-                                                                         "amount": 70, "total-cost": 21140},
-                                                                        {"id": 53, "created_at": "2024-02-24",
-                                                                         "user": "rafievvv@gmail.com",
-                                                                         "storage": {"id": 6, "title": "Cклад",
-                                                                                     "owner": "Team_1", "parent": None,
-                                                                                     "amount": 0},
-                                                                         "amount": 70, "total-cost": 21140}]})})
 
-sale_get_detail_swagger = swagger_auto_schema(
-    operation_summary="Получение деталей продажи",
-    operation_description="Этот эндпоинт возвращает детали продажи по ее идентификатору.",
+    responses={200: openapi.Response(description="",
+                                     examples={"application/json": [{"id": 8, "created_at": "2024-03-30",
+                                                                     "user": "rafiev@g.com",
+                                                                     "storage": {"id": 1,
+                                                                                 "title": "Контейнер",
+                                                                                 "owner": "teenwolf",
+                                                                                 "parent": None,
+                                                                                 "amount": 297},
+                                                                     "action_type": "Возврат",
+                                                                     "amount": 3},
+                                                                    {"id": 9, "created_at": "2024-03-10",
+                                                                     "user": "rafiev@g.com",
+                                                                     "storage": {"id": 1,
+                                                                                 "title": "Контейнер",
+                                                                                 "owner": "teenwolf",
+                                                                                 "parent": None,
+                                                                                 "amount": 297},
+                                                                     "action_type": "Возврат",
+                                                                     "amount": 3}]})})
+
+action_get_detail_swagger = swagger_auto_schema(
+    operation_summary="Получение деталей действия",
+    operation_description="Этот эндпоинт возвращает детали действия по ее идентификатору.",
     responses={
         200: openapi.Response(description="", schema=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -89,19 +156,19 @@ sale_get_detail_swagger = swagger_auto_schema(
                                                                               type=openapi.TYPE_INTEGER),
                                                                           "price": openapi.Schema(
                                                                               type=openapi.TYPE_INTEGER),
-                                                                          "season": openapi.Schema(
-                                                                              type=openapi.TYPE_STRING),
                                                                           "total-cost": openapi.Schema(
                                                                               type=openapi.TYPE_INTEGER
                                                                           )
                                                                       })),
                         "user": openapi.Schema(type=openapi.TYPE_STRING),
+                        "season": openapi.Schema(type=openapi.TYPE_STRING),
+                        "action_type": openapi.Schema(type=openapi.TYPE_STRING),
                         "owner": openapi.Schema(type=openapi.TYPE_STRING)})),
         400: openapi.Response(description="", examples={"application/json": {"msg": "Объект не найден"}})})
 
-sale_delete_swagger = swagger_auto_schema(
-    operation_summary="Удаление продажи",
-    operation_description="Этот эндпоинт удаляет продажу по ее идентификатору.",
+action_delete_swagger = swagger_auto_schema(
+    operation_summary="Удаление действия",
+    operation_description="Этот эндпоинт удаляет действие по ее идентификатору.",
     responses={
         204: openapi.Response(description="", examples={"application/json": {"msg": "Объект успешно удален"}}),
         401: openapi.Response(description="", examples={"application/json": {"msg": "У вас нет прав на это"}}),

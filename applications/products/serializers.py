@@ -30,6 +30,7 @@ class WheelSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def update(self, instance, validated_data):
+        instance.season = validated_data.get('season', instance.season)
         instance.title = validated_data.get('title', instance.title)
         instance.amount = validated_data.get('amount', instance.amount)
         instance.price = validated_data.get('price', instance.price)
@@ -81,29 +82,30 @@ class AcceptanceSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         validated_data['owner'] = request.user.team
         validated_data['user'] = request.user
-        try:
-            validated_data['wheels'].extend(new_wheels_data)
-        except KeyError:
-            validated_data['wheels'] = new_wheels_data
-        acceptance = Acceptance.objects.create(**validated_data)
         wheels_data = validated_data.get('wheels', [])
         new_wheels_to_create = [Wheel(**wheel_data, owner=request.user.team, storage=validated_data['storage']) for
                                 wheel_data in new_wheels_data]
-        Wheel.objects.bulk_create(new_wheels_to_create)
+
+        wheels_to_update = list()
         if wheels_data:
-            wheels_to_update = list()
             for wheel_data in wheels_data:
                 title = wheel_data['title']
                 amount = wheel_data['amount']
-                season = wheel_data['season']
                 try:
-                    wheel = Wheel.objects.get(owner=request.user.team, title=title, season=season,
+                    wheel = Wheel.objects.get(owner=request.user.team, title=title, season=validated_data['season'],
                                               storage=validated_data['storage'])
                     wheel.amount += amount
                     wheels_to_update.append(wheel)
                 except Wheel.DoesNotExist:
                     pass
             Wheel.objects.bulk_update(wheels_to_update, ['amount'])
+
+        Wheel.objects.bulk_create(new_wheels_to_create)
+        try:
+            validated_data['wheels'].extend(new_wheels_data)
+        except KeyError:
+            validated_data['wheels'] = new_wheels_data
+        acceptance = Acceptance.objects.create(**validated_data)
 
         return acceptance
 
@@ -119,7 +121,7 @@ class AcceptanceListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Acceptance
-        fields = ['id', 'created_at', 'user', 'storage']
+        fields = ['id', 'created_at', 'user', 'storage', ]
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
