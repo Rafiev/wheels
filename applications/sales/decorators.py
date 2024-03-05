@@ -16,10 +16,9 @@ sale_post_swagger = swagger_auto_schema(
                                                                   }))},
         required=['created_at', 'storage', 'wheels']),
     responses={
-        201: openapi.Response(description="",
-                              examples={'application/json': {'msg': 'Ваша продажа успешно добавлена'}}),
-        400: openapi.Response(description=" ",
-                              examples={'application/json': {'msg': 'serializer.error'}})},
+        201: openapi.Response(description="", examples={'application/json': {'msg': 'Ваша продажа успешно добавлена'}}),
+        400: openapi.Response(description=" ", examples={'application/json': {'msg': 'serializer.error'}}),
+        409: openapi.Response(description="", examples={"application/json": {"msg": "У вас нет прав на это"}})},
     operation_summary="Добавление продажи",
     operation_description="Этот эндпоинт используется для добавления новой продажи.")
 
@@ -38,10 +37,9 @@ defect_post_swagger = swagger_auto_schema(
                                                                   }))},
         required=['created_at', 'storage', 'wheels']),
     responses={
-        201: openapi.Response(description="",
-                              examples={'application/json': {'msg': 'Ваш брак успешно добавлен'}}),
-        400: openapi.Response(description=" ",
-                              examples={'application/json': {'msg': 'serializer.error'}})},
+        201: openapi.Response(description="", examples={'application/json': {'msg': 'Ваш брак успешно добавлен'}}),
+        400: openapi.Response(description=" ", examples={'application/json': {'msg': 'serializer.error'}}),
+        409: openapi.Response(description="", examples={"application/json": {"msg": "У вас нет прав на это"}})},
     operation_summary="Добавление брака",
     operation_description="Этот эндпоинт используется для добавления нового брака.")
 
@@ -60,10 +58,9 @@ return_post_swagger = swagger_auto_schema(
                                                                   }))},
         required=['created_at', 'storage', 'wheels']),
     responses={
-        201: openapi.Response(description="",
-                              examples={'application/json': {'msg': 'Ваш возврат успешно добавлен'}}),
-        400: openapi.Response(description=" ",
-                              examples={'application/json': {'msg': 'serializer.error'}})},
+        201: openapi.Response(description="", examples={'application/json': {'msg': 'Ваш возврат успешно добавлен'}}),
+        400: openapi.Response(description="", examples={'application/json': {'msg': 'serializer.error'}}),
+        409: openapi.Response(description="", examples={"application/json": {"msg": "У вас нет прав на это"}})},
     operation_summary="Добавление возврата",
     operation_description="Этот эндпоинт используется для добавления нового возврата.")
 
@@ -171,7 +168,7 @@ action_delete_swagger = swagger_auto_schema(
     operation_description="Этот эндпоинт удаляет действие по ее идентификатору.",
     responses={
         204: openapi.Response(description="", examples={"application/json": {"msg": "Объект успешно удален"}}),
-        401: openapi.Response(description="", examples={"application/json": {"msg": "У вас нет прав на это"}}),
+        409: openapi.Response(description="", examples={"application/json": {"msg": "У вас нет прав на это"}}),
         404: openapi.Response(description="", examples={"application/json": {"msg": "Объект не найден"}})
     }
 )

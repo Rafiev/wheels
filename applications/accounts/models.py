@@ -36,7 +36,7 @@ class UserManager(BaseUserManager):
 
 
 class Team(models.Model):
-    title = models.CharField(max_length=30)
+    title = models.CharField(max_length=30, unique=True)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
 
     def __str__(self):
@@ -54,6 +54,7 @@ class CustomUser(AbstractUser):
     password = models.CharField(max_length=100)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='workers', null=True)
     role = models.CharField(max_length=15, choices=Role.choices, default=Role.WORKER,)
+    functions = models.JSONField(null=True)
 
     objects = UserManager()
 

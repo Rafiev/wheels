@@ -7,6 +7,8 @@ urlpatterns = [
     path('refresh/', views.CustomTokenRefreshView.as_view(), name='custom_token_refresh'),
     path('register/', views.RegisterAPIView.as_view(), name='register'),
     path('users_team/', views.GetTeamAPIView.as_view(), name='users_team'),
-    path('team/', views.TeamAPIView.as_view(), name='team'),
+    path('team/', views.AdminTeamAPIView.as_view(), name='team'),
     path('change_password/', views.ChangePasswordAPIView.as_view(), name='change-password'),
+    path('profile/', views.UserProfile.as_view(), name='profile'),
+    path('user_off/', views.UserOffAPIView.as_view(), name='user-off')
 ]

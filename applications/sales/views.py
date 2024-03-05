@@ -15,6 +15,8 @@ class SaleAPIView(APIView):
 
     @sale_post_swagger
     def post(self, request, *args, **kwargs):
+        if not request.user.functions.get('Создание продаж', False):
+            return Response({"msg": "У вас нет прав на это"}, status=status.HTTP_409_CONFLICT)
         context = {'request': request}
         serializer = SaleSerializer(data=request.data, context=context)
         if serializer.is_valid():
@@ -28,6 +30,8 @@ class ReturnAPIView(APIView):
 
     @return_post_swagger
     def post(self, request, *args, **kwargs):
+        if not request.user.functions.get('Возврат', False):
+            return Response({"msg": "У вас нет прав на это"}, status=status.HTTP_409_CONFLICT)
         context = {'request': request}
         serializer = ReturnSerializer(data=request.data, context=context)
         if serializer.is_valid():
@@ -41,6 +45,8 @@ class DefectAPIView(APIView):
 
     @defect_post_swagger
     def post(self, request, *args, **kwargs):
+        if not request.user.functions.get('Брак', False):
+            return Response({"msg": "У вас нет прав на это"}, status=status.HTTP_409_CONFLICT)
         context = {'request': request}
         serializer = DefectSerializer(data=request.data, context=context)
         if serializer.is_valid():

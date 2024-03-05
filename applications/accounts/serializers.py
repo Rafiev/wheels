@@ -8,7 +8,7 @@ User = get_user_model()
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['email', 'password', 'role', 'team']
+        fields = ['id', 'email', 'password', 'role', 'team', 'functions']
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
@@ -21,6 +21,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 
 class TeamSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Team
         fields = '__all__'
