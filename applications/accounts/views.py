@@ -75,9 +75,10 @@ class RegisterAPIView(views.APIView):
 
     @register_swagger
     def post(self, request, *args, **kwargs):
+        context = {'request': request}
         if not request.user.role == 'Owner':
-            return Response({'msg': 'У вас нет прав на это'}, status=status.HTTP_409_BAD_REQUEST)
-        serializer = CustomUserSerializer(data=request.data)
+            return Response({'msg': 'У вас нет прав на это'}, status=status.HTTP_409_CONFLICT)
+        serializer = CustomUserSerializer(data=request.data, context=context)
         if serializer.is_valid():
             serializer.save()
             return Response({'msg': serializer.data}, status=status.HTTP_201_CREATED)

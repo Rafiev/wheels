@@ -11,6 +11,9 @@ class CustomUserSerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'password', 'role', 'team', 'functions']
 
     def create(self, validated_data):
+        request = self.context.get('request')
+        team_title = request.user.team
+        validated_data['team'] = team_title
         user = User.objects.create_user(**validated_data)
         return user
 

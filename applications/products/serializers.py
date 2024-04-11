@@ -105,8 +105,9 @@ class AcceptanceSerializer(serializers.ModelSerializer):
             validated_data['wheels'].extend(new_wheels_data)
         except KeyError:
             validated_data['wheels'] = new_wheels_data
+        for item in validated_data['wheels']:
+            item['id'] = Wheel.objects.get(owner=request.user.team, title=item['title'], season=validated_data['season']).id
         acceptance = Acceptance.objects.create(**validated_data)
-
         return acceptance
 
     def to_representation(self, instance):
