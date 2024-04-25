@@ -12,12 +12,13 @@ class Storage(models.Model):
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
 
     def __str__(self):
-        return self.title
+        return f'{self.owner}: {self.title}'
 
 
 class Season(models.TextChoices):
     WINTER = 'Зима'
     SUMMER = 'Лето'
+    ALL_SEASON = 'Всесезонка'
 
 
 class Wheel(models.Model):
@@ -26,10 +27,10 @@ class Wheel(models.Model):
     amount = models.PositiveIntegerField(default=0)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     storage = models.ForeignKey(Storage, on_delete=models.CASCADE, related_name='wheels')
-    season = models.CharField(max_length=4, choices=Season.choices, default=Season.SUMMER, )
+    season = models.CharField(max_length=10, choices=Season.choices, default=Season.SUMMER, )
 
     def __str__(self):
-        return self.title
+        return f'{self.owner}: {self.title}'
 
 
 class Acceptance(models.Model):
@@ -38,4 +39,8 @@ class Acceptance(models.Model):
     owner = models.ForeignKey(Team, on_delete=models.CASCADE, null=True, related_name='acceptance')
     storage = models.ForeignKey(Storage, on_delete=models.CASCADE, related_name='acceptance')
     wheels = models.JSONField(null=True)
-    season = models.CharField(max_length=4, choices=Season.choices, default=Season.SUMMER, )
+    season = models.CharField(max_length=10, choices=Season.choices, default=Season.SUMMER)
+
+    def __str__(self):
+        return f'{self.owner}: Acceptance {self.id}'
+

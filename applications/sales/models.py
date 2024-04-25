@@ -15,7 +15,7 @@ class Action(models.Model):
         DEFECT = 'Брак'
         RETURN = 'Возврат'
 
-    season = models.CharField(max_length=4, choices=Season.choices, default=Season.SUMMER,)
+    season = models.CharField(max_length=10, choices=Season.choices, default=Season.SUMMER,)
     action_type = models.CharField(max_length=10,  choices=ActionType.choices, default=ActionType.SALE, )
     created_at = models.DateField(default=timezone.now)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='action')
@@ -24,4 +24,4 @@ class Action(models.Model):
     wheels = models.JSONField()
 
     def __str__(self):
-        return self.action_type
+        return f'{self.owner}: {self.action_type}'

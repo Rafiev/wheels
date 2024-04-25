@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from applications.products.models import Wheel
-from applications.products.serializers import StorageSerializer
+from applications.products.serializers import StorageSerializer, WheelDetailSerializer
 from applications.sales.models import Action
 
 
@@ -29,42 +29,19 @@ class SaleSerializer(serializers.ModelSerializer):
             wheel.amount -= amount
             wheel_list_for_update.append(wheel)
         Wheel.objects.bulk_update(wheel_list_for_update, ['amount'])
+        wheels_data = list()
         for item in validated_data['wheels']:
-            item['total-cost'] = item['amount'] * item['price']
-            item['id'] = Wheel.objects.get(owner=request.user.team, title=item['title'], season=validated_data['season']).id
+            wheel = Wheel.objects.get(owner=request.user.team, title=item['title'],
+                                      season=validated_data['season'])
+            wheel.amount = item['amount']
+            wheel.price = item['price']
+            wheel_serializer = WheelDetailSerializer(wheel)
+            wheel_details = wheel_serializer.data
+            wheels_data.append(wheel_details)
+        validated_data['wheels'] = wheels_data
         sale = Action.objects.create(**validated_data)
         return sale
 
-
-# class SaleListSerializer(serializers.ModelSerializer):
-#     storage = StorageSerializer()
-#
-#     class Meta:
-#         model = Sale
-#         fields = ['id', 'created_at', 'user', 'storage']
-#
-#     def to_representation(self, instance):
-#         representation = super().to_representation(instance)
-#         representation['user'] = instance.user.email
-#         representation['amount'] = sum([i.get('amount', 0) for i in instance.wheels])
-#         representation['total-cost'] = sum([i.get('total-cost', 0) for i in instance.wheels])
-#         return representation
-#
-#
-# class SaleDetailSerializer(serializers.ModelSerializer):
-#     storage = StorageSerializer()
-#
-#     class Meta:
-#         model = Sale
-#         fields = '__all__'
-#
-#     def to_representation(self, instance):
-#         representation = super().to_representation(instance)
-#         representation['owner'] = instance.owner.title
-#         representation['user'] = instance.user.email
-#
-#         return representation
-#
 
 class DefectSerializer(serializers.ModelSerializer):
 
@@ -77,37 +54,17 @@ class DefectSerializer(serializers.ModelSerializer):
         validated_data['owner'] = request.user.team
         validated_data['user'] = request.user
         validated_data['action_type'] = 'Брак'
+        wheels_data = list()
+        for item in validated_data['wheels']:
+            wheel = Wheel.objects.get(owner=request.user.team, title=item['title'],
+                                      season=validated_data['season'])
+            wheel.amount = item['amount']
+            wheel_serializer = WheelDetailSerializer(wheel)
+            wheel_details = wheel_serializer.data
+            wheels_data.append(wheel_details)
+        validated_data['wheels'] = wheels_data
         defect_obj = Action.objects.create(**validated_data)
         return defect_obj
-
-#
-# class DefectListSerializer(serializers.ModelSerializer):
-#     storage = StorageSerializer()
-#
-#     class Meta:
-#         model = Defect
-#         fields = ['id', 'created_at', 'user', 'storage']
-#
-#     def to_representation(self, instance):
-#         representation = super().to_representation(instance)
-#         representation['user'] = instance.user.email
-#
-#         return representation
-#
-#
-# class DefectDetailSerializer(serializers.ModelSerializer):
-#     storage = StorageSerializer()
-#
-#     class Meta:
-#         model = Defect
-#         fields = '__all__'
-#
-#     def to_representation(self, instance):
-#         representation = super().to_representation(instance)
-#         representation['owner'] = instance.owner.title
-#         representation['user'] = instance.user.email
-#
-#         return representation
 
 
 class ReturnSerializer(serializers.ModelSerializer):
@@ -121,19 +78,21 @@ class ReturnSerializer(serializers.ModelSerializer):
         validated_data['owner'] = request.user.team
         validated_data['user'] = request.user
         validated_data['action_type'] = 'Возврат'
-        wheels_data = validated_data.get('wheels', [])
         wheels_to_update = list()
-        for wheel_data in wheels_data:
-            title = wheel_data['title']
-            amount = wheel_data['amount']
-            try:
-                wheel = Wheel.objects.get(owner=request.user.team, title=title, season=validated_data['season'],
-                                          storage=validated_data['storage'])
-                wheel.amount += amount
-                wheels_to_update.append(wheel)
-            except Wheel.DoesNotExist:
-                pass
+        wheels_data = list()
+        for item in validated_data['wheels']:
+            title = item['title']
+            amount = item['amount']
+            wheel = Wheel.objects.get(owner=request.user.team, title=title, season=validated_data['season'],
+                                      storage=validated_data['storage'])
+            wheel.amount += amount
+            wheels_to_update.append(wheel)
+            wheel_serializer = WheelDetailSerializer(wheel)
+            wheel_details = wheel_serializer.data
+            wheel_details['amount'] = amount
+            wheels_data.append(wheel_details)
         Wheel.objects.bulk_update(wheels_to_update, ['amount'])
+        validated_data['wheels'] = wheels_data
         ret_obj = Action.objects.create(**validated_data)
         return ret_obj
 

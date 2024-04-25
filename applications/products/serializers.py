@@ -54,7 +54,7 @@ class WheelListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Wheel
-        fields = ['id', 'title', 'amount']
+        fields = ['id', 'title', 'amount', 'season']
 
 
 class WheelDetailSerializer(serializers.ModelSerializer):
@@ -83,14 +83,15 @@ class AcceptanceSerializer(serializers.ModelSerializer):
         validated_data['owner'] = request.user.team
         validated_data['user'] = request.user
         wheels_data = validated_data.get('wheels', [])
-        new_wheels_to_create = [Wheel(**wheel_data, owner=request.user.team, storage=validated_data['storage']) for
-                                wheel_data in new_wheels_data]
+        new_wheels_to_create = [Wheel(**wheel_data, owner=request.user.team, season=validated_data['season'],
+                                      storage=validated_data['storage']) for wheel_data in new_wheels_data]
 
-        wheels_to_update = list()
         if wheels_data:
+            wheels_to_update = list()
             for wheel_data in wheels_data:
                 title = wheel_data['title']
                 amount = wheel_data['amount']
+
                 try:
                     wheel = Wheel.objects.get(owner=request.user.team, title=title, season=validated_data['season'],
                                               storage=validated_data['storage'])
@@ -98,6 +99,7 @@ class AcceptanceSerializer(serializers.ModelSerializer):
                     wheels_to_update.append(wheel)
                 except Wheel.DoesNotExist:
                     pass
+
             Wheel.objects.bulk_update(wheels_to_update, ['amount'])
 
         Wheel.objects.bulk_create(new_wheels_to_create)
@@ -105,8 +107,14 @@ class AcceptanceSerializer(serializers.ModelSerializer):
             validated_data['wheels'].extend(new_wheels_data)
         except KeyError:
             validated_data['wheels'] = new_wheels_data
+        wheels_list = list()
         for item in validated_data['wheels']:
-            item['id'] = Wheel.objects.get(owner=request.user.team, title=item['title'], season=validated_data['season']).id
+            wheel = Wheel.objects.get(owner=request.user.team, title=item['title'], season=validated_data['season'])
+            wheel.amount = item['amount']
+            wheel_serializer = WheelDetailSerializer(wheel)
+            wheel_details = wheel_serializer.data
+            wheels_list.append(wheel_details)
+        validated_data['wheels'] = wheels_list
         acceptance = Acceptance.objects.create(**validated_data)
         return acceptance
 

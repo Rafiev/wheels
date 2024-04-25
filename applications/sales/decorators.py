@@ -143,20 +143,33 @@ action_get_detail_swagger = swagger_auto_schema(
                                                               }),
                         "created_at": openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_DATE),
                         "wheels": openapi.Schema(type=openapi.TYPE_ARRAY,
-                                                 items=openapi.Schema(type=openapi.TYPE_OBJECT,
-                                                                      properties={
+                                                 items=openapi.Schema(type=openapi.TYPE_ARRAY,
+                                                                      items=openapi.Schema(type=openapi.TYPE_OBJECT,
+                                                                                           properties={
                                                                           "id": openapi.Schema(
+                                                                              type=openapi.TYPE_INTEGER),
+                                                                          "owner": openapi.Schema(
+                                                                              type=openapi.TYPE_STRING),
+                                                                          "price": openapi.Schema(
                                                                               type=openapi.TYPE_INTEGER),
                                                                           "title": openapi.Schema(
                                                                               type=openapi.TYPE_STRING),
                                                                           "amount": openapi.Schema(
                                                                               type=openapi.TYPE_INTEGER),
-                                                                          "price": openapi.Schema(
-                                                                              type=openapi.TYPE_INTEGER),
-                                                                          "total-cost": openapi.Schema(
-                                                                              type=openapi.TYPE_INTEGER
-                                                                          )
-                                                                      })),
+                                                                          "season": openapi.Schema(
+                                                                              type=openapi.TYPE_STRING),
+                                                                          "storage": openapi.Schema(
+                                                                              type=openapi.TYPE_OBJECT,
+                                                                              properties={"id": openapi.Schema(
+                                                                                  type=openapi.TYPE_INTEGER),
+                                                                                          "title": openapi.Schema(
+                                                                                              type=openapi.TYPE_STRING),
+                                                                                          "owner": openapi.Schema(
+                                                                                              type=openapi.TYPE_STRING),
+                                                                                          "parent": openapi.Schema(
+                                                                                              type=openapi.TYPE_STRING,
+                                                                                              default=None)}),
+                                                                      }))),
                         "user": openapi.Schema(type=openapi.TYPE_STRING),
                         "season": openapi.Schema(type=openapi.TYPE_STRING),
                         "action_type": openapi.Schema(type=openapi.TYPE_STRING),

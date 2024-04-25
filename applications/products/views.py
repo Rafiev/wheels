@@ -119,7 +119,6 @@ class AcceptanceAPIView(APIView):
 
     @acceptance_post_swagger
     def post(self, request, *args, **kwargs):
-        print(request.user.functions)
         if not request.user.functions.get('Создание приемки', False):
             return Response({"msg": "У вас нет прав на это"}, status=status.HTTP_409_CONFLICT)
         context = {'request': request}
