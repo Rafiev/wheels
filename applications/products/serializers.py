@@ -130,7 +130,7 @@ class AcceptanceListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Acceptance
-        fields = ['id', 'created_at', 'user', 'storage', ]
+        fields = ['id', 'created_at', 'user', 'storage', 'season']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
